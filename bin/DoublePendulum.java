@@ -14,7 +14,7 @@ import java.awt.*;
 import org.math.plot.*;
 import org.math.plot.plotObjects.*;
 
-public class doublePendulum
+public class DoublePendulum
 {
 	// constants
 	public static final double G = 9.807;	//acceleration due to gravity in m/s/s
