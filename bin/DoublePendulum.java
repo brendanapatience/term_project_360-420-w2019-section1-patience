@@ -9,13 +9,13 @@ public class DoublePendulum extends JPanel implements Runnable {
   private double M2 = 1;              //mass of outer bob (kg)
 	private double G = 9.81;					  //force of gravity (N/kg)
 	private double DT = 0.01;					  //step height (s)
-  private boolean difSol = true;      //differential equation solver: true for fourth order runge kutta, false for euler's
+  private boolean difSol = false;      //differential equation solver: set to true for fourth order runge kutta, false for euler's
 
 	//variables
   private double t1 = Math.PI /2;  	 	//initial angle of inner bob (rad)
   private double t2 = Math.PI /2;   	//initial angle of outer bob (rad)
-	private double w1 = 0;					   	//initial angular velocity of inner bob (rad/s)
-	private double w2 = 0;						  //initial angular velocity of outer bob (rad/s)
+	private double w1;					       	//angular velocity of inner bob (rad/s)
+	private double w2;						      //angular velocity of outer bob (rad/s)
 	private double p1;                  //angular momentum of inner bob (kg*m^2 / s)
 	private double p2;                  //angular momentum of outer bob (kg*m^2 / s)
   private double p1dot;               //derivative of p1 (N*m)
@@ -26,11 +26,6 @@ public class DoublePendulum extends JPanel implements Runnable {
   private double mechanical;
 
     public DoublePendulum() {
-        this.L = L;
-        this.M1 = M1;
-        this.M2 = M2;
-				this.G = G;
-				this.DT= DT;
         this.t1 = t1;
         this.t2 = t2;
 				this.p1 = (M1 + M2) * w1 * L*L + M2 * w2 * L*L * Math.cos(t1-t2);
@@ -79,6 +74,8 @@ public class DoublePendulum extends JPanel implements Runnable {
                 p2 = newVar[3];
             }
 
+            calculateEnergies();
+
             //function to display the next frame
             repaint();
             try { Thread.sleep(1); } catch (InterruptedException ex) {}
@@ -92,7 +89,6 @@ public class DoublePendulum extends JPanel implements Runnable {
     }
 
     public double[] euler() {
-        DT = this.DT;
 
         double[] baseVar = {this.t1, this.t2, this.p1, this.p2};
         double[] newVar = new double[baseVar.length];
@@ -107,7 +103,6 @@ public class DoublePendulum extends JPanel implements Runnable {
     }
 
     public double[] rungeKutta() {
-        DT = this.DT;
 
         double[] baseVar = {this.t1, this.t2, this.p1, this.p2}; //initial variables (yn)
         double[] interVar = new double[baseVar.length];          //intermediate variables
@@ -135,9 +130,9 @@ public class DoublePendulum extends JPanel implements Runnable {
 
     //this function is an intermediate step to be able to manipulate k in the rungeKutta method
     public double[] intermediate(double[] base, double[] k, double div) {
-        DT = this.DT;
 
         double[] inter = new double[base.length];
+
         for (int i = 0; i < base.length; i++) {
             inter[i] = base[i] + (k[i] * DT) / div;
         }
@@ -166,6 +161,18 @@ public class DoublePendulum extends JPanel implements Runnable {
 				double[] hamVar = {w1, w2, p1dot, p2dot};
 				return hamVar;
 		}
+
+    public void calculateEnergies() {
+
+        potential = G * L * (M1 * (1 - Math.cos(t1)) + M2 * (2 - Math.cos(t1) - Math.cos(t2)));
+
+        kinetic = 0.5 * (M1 + M2) * w1*w1 * L*L + 0.5 * M2 * w2*w2 * L*L +
+                      M2 * w1 * w2 * L*L * Math.cos(t1-t2);
+
+        mechanical = potential + kinetic;
+
+        System.out.println(mechanical);
+    }
 
     public static void main(String[] args) {
         JFrame f = new JFrame("Double Pendulum");
