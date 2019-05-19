@@ -1,3 +1,4 @@
+import java.io.*;
 import java.awt.*;
 import javax.swing.*;
 
@@ -10,6 +11,7 @@ public class DoublePendulum extends JPanel implements Runnable {
 	private double G = 9.81;					  //force of gravity (N/kg)
 	private double DT = 0.01;					  //step height (s)
   private boolean difSol = false;      //differential equation solver: set to true for fourth order runge kutta, false for euler's
+  private boolean file = false;        //set to true to calculate and write mechanical energy vs time to a file, false to not do that
 
 	//variables
   private double t1 = Math.PI /2;  	 	//initial angle of inner bob (rad)
@@ -20,16 +22,18 @@ public class DoublePendulum extends JPanel implements Runnable {
 	private double p2;                  //angular momentum of outer bob (kg*m^2 / s)
   private double p1dot;               //derivative of p1 (N*m)
   private double p2dot;               //derivative of p2 (N*m)
+  private double ttot;                //total time elapsed (s)
 
-  private double kinetic;
-  private double potential;
-  private double mechanical;
+  private double kinetic;             //kinetic energy of system (J)
+  private double potential;           //potential energy of system (J)
+  private double mechanical;          //mechanical energy of system (J)
 
     public DoublePendulum() {
         this.t1 = t1;
         this.t2 = t2;
 				this.p1 = (M1 + M2) * w1 * L*L + M2 * w2 * L*L * Math.cos(t1-t2);
 				this.p2 = M2 * w2 * L*L + M2 * w1 * L*L * Math.cos(t1-t2);
+        this.ttot = ttot;
         setDoubleBuffered(true);
     }
 
@@ -74,7 +78,11 @@ public class DoublePendulum extends JPanel implements Runnable {
                 p2 = newVar[3];
             }
 
-            calculateEnergies();
+            this.ttot += DT;
+            if (file && this.ttot % 5 < 0.01) {
+                calculateEnergies();
+
+            }
 
             //function to display the next frame
             repaint();
@@ -162,6 +170,7 @@ public class DoublePendulum extends JPanel implements Runnable {
 				return hamVar;
 		}
 
+    //caculates and displays the mechanical energy of system
     public void calculateEnergies() {
 
         potential = G * L * (M1 * (1 - Math.cos(t1)) + M2 * (2 - Math.cos(t1) - Math.cos(t2)));
@@ -171,10 +180,22 @@ public class DoublePendulum extends JPanel implements Runnable {
 
         mechanical = potential + kinetic;
 
-        System.out.println(mechanical);
+        try(FileWriter fw = new FileWriter("mechanical energy vs time.txt", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw)) {
+              out.println(mechanical + "\t" + this.ttot);
+        } catch (IOException e) {
+            System.out.println("yup that didn't work");
+        }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
+
+        //erase content of old file
+        PrintWriter writer = new PrintWriter("mechanical energy vs time.txt");
+        writer.print("");
+        writer.close();
+
         JFrame f = new JFrame("Double Pendulum");
         DoublePendulum p = new DoublePendulum();
         f.add(p);
