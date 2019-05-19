@@ -12,3 +12,8 @@ https://www.myphysicslab.com/pendulum/double-pendulum-en.html
 
 used this to obtain my lagrangian and hamilton equations
 http://scienceworld.wolfram.com/physics/DoublePendulum.html
+
+used these three to find out how to write to files
+https://www.dreamincode.net/forums/topic/299777-error-unreported-exception-filenotfoundexception/
+https://stackoverflow.com/questions/1625234/how-to-append-text-to-an-existing-file-in-java
+https://stackoverflow.com/questions/5797208/java-how-do-i-write-a-file-to-a-specified-directory
