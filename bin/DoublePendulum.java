@@ -10,8 +10,8 @@ public class DoublePendulum extends JPanel implements Runnable {
   private double M2 = 1;              //mass of outer bob (kg)
 	private double G = 9.81;					  //force of gravity (N/kg)
 	private double DT = 0.01;					  //step height (s)
-  private boolean difSol = false;      //differential equation solver: set to true for fourth order runge kutta, false for euler's
-  private boolean file = false;        //set to true to calculate and write mechanical energy vs time to a file, false to not do that
+  public static boolean difSol = true;      //differential equation solver: set to true for fourth order runge kutta, false for euler's
+  private static boolean file = true;        //set to true to calculate and write mechanical energy vs time to a file, false to not do that
 
 	//variables
   private double t1 = Math.PI /2;  	 	//initial angle of inner bob (rad)
@@ -180,21 +180,36 @@ public class DoublePendulum extends JPanel implements Runnable {
 
         mechanical = potential + kinetic;
 
-        try(FileWriter fw = new FileWriter("mechanical energy vs time.txt", true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter out = new PrintWriter(bw)) {
-              out.println(mechanical + "\t" + this.ttot);
-        } catch (IOException e) {
-            System.out.println("yup that didn't work");
+        //appending energy to the runge kutta file
+        if (difSol) {
+            try(FileWriter fw = new FileWriter("/home/brendan/term_project_360-420-w2019-section1-patience/data/runge-kutta energy vs time.txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw)) {
+                  out.println(mechanical + "\t" + this.ttot);
+            } catch (IOException e) {
+                System.out.println("yup that didn't work");
+            }
+        }
+        //apending energy to the euler file
+        else {
+            try(FileWriter fw = new FileWriter("/home/brendan/term_project_360-420-w2019-section1-patience/data/euler energy vs time.txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw)) {
+                  out.println(mechanical + "\t" + this.ttot);
+            } catch (IOException e) {
+                System.out.println("yup that didn't work");
+            }
         }
     }
 
     public static void main(String[] args) throws FileNotFoundException {
 
         //erase content of old file
-        PrintWriter writer = new PrintWriter("mechanical energy vs time.txt");
-        writer.print("");
-        writer.close();
+        if (difSol) {
+            PrintWriter writer = new PrintWriter("/home/brendan/term_project_360-420-w2019-section1-patience/data/runge-kutta energy vs time.txt");
+        } else {
+            PrintWriter writer = new PrintWriter("/home/brendan/term_project_360-420-w2019-section1-patience/data/euler energy vs time.txt");
+        }
 
         JFrame f = new JFrame("Double Pendulum");
         DoublePendulum p = new DoublePendulum();
