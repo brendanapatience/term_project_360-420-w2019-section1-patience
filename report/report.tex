@@ -1,0 +1,183 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{indentfirst}
+\usepackage{pgfplots}
+
+\title{The Double Pendulum}
+\author{Brendan Patience}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+My project was to simulate and analyze the double pendulum. Since this kind
+of pendulum is a chaotic system, I wanted to see how two different numerical
+methods would calculate the path. I chose Euler's method and the fourth
+order Runge-Kutta method. In fact, Euler's method was just recently taught
+and was explained to be one  of the easiest methods to numerically integrate
+ordinary differential equations. But due to its simplicity, it also has a
+higher degree of error. I wanted to see how it would perform in a chaotic
+system. To determine whether it is indeed a viable solution for the equations
+of motion of the double pendulum, I analyzed the mechanical energy of the
+system. The only force acting on the pendulum in my simulation is gravity, 
+so the total energy must be conserved. My hypothesis was that Euler's method
+would be too simplistic as an ODE solver and that this would manifest in
+a change of mechanical energy (whether decrease or increase, but not stay
+constant).
+
+\section*{Description of Numerical Method}
+
+Before applying the ODE solvers, the equations of motion of the pendulum
+must be obtained. The first step is to find the Lagrangian of the 
+pendulum, given by
+
+\[L = T - V \]
+
+where T is the kinetic energy and V is the potential energy. We can then
+obtain the canonical momentum equations, by deriving the Lagrangian with
+respect to the angular velocity of each bob:
+
+\[p_1 = \frac{\partial L}{\partial \dot{\theta_1}} \]
+\[p_2 = \frac{\partial L}{\partial \dot{\theta_2}} \]
+
+The next step is to convert the Lagrangian equation into the Hamiltonian
+equation, expressed by the following relationship
+
+\[H = \sum_{i=1}^{2} \left( \dot{\theta_i} p_i \right) - L \]
+
+Finally, the Hamilton equations can be obtained by deriving the Hamiltonian
+with respect to both momenta and both angles.
+
+\[ \dot{\theta_i} = \frac{\partial H}{\partial p_i} \]
+\[ \dot{p_i} = - \frac{\partial H}{\partial \theta_i} \]
+
+The final equations of motion are the following:
+
+\[ \dot{\theta_1} = \frac{l p_1 - l p_2 \cos \left(\theta_1 - \theta_2 \right)}
+						 {l^3 \left[ m_1 + m_2 \sin^2 \left( \theta_1 - 
+							\theta_2 \right) \right]} \]
+
+\[ \dot{\theta_2} = \frac{l \left(m_1 + m_2\right) p_2 - l m_2 p_1 \cos 
+									\left(\theta_1 - \theta_2 \right)}
+						 {l^3 m_2 \left[ m_1 + m_2 \sin^2 \left( \theta_1 - 
+							\theta_2 \right) \right]} \]
+
+\[ \dot{p_1} = - \left(m_1 + m_2\right) g l \sin \theta_1 - A_1 + A_2\]
+
+\[ \dot{p_2} = - m_2 g l \sin \theta_2 + A_1 - A_2\]
+
+where
+
+\[ A_1 = \frac{p_1 p_2 \sin \left( \theta_1 - \theta_2 \right)}
+			  {l^2 \left[m_1 + m_2 sin^2 \left( \theta_1 - \theta_2 \right)\right]} \]
+			  
+\[ A_2 = \frac{l^2 m_2 p_1^2 + l^2 \left( m_1 + m_2 \right) p_2^2 - l^2 m_2 p_1 p_2 
+					\cos \left( \theta_1 - \theta_2 \right)}
+			  {2 l^4 \left[ m_1 + m_2 \sin^2 \left( \theta_1 - 
+					\theta_2 \right)\right]^2}
+		 \sin \left[ 2 \right( \theta_1 - \theta_2 \left) \right] \]
+
+At this point there are four first order differential equations. These can
+now be solved using the numerical methods in question, namely Euler's and
+the fourth order Runge-Kutta. \\ \\
+\indent Euler's:
+
+\[ y_{n+1} = y_n + h f' \left( t_n, y_n \right)\]
+
+RK4:
+
+\[ k_1 = h f' \left(t_n, y_n \right) \]
+\[ k_2 = h f' \left(t_n + \frac{h}{2}, y_n + \frac{k_1}{2} \right) \]
+\[ k_3 = h f' \left(t_n + \frac{h}{2}, y_n + \frac{k_1}{2} \right) \]
+\[ k_4 = h f' \left(t_n + h, y_n + k_3 \right) \]
+
+\[ y_{n+1} = y_n + \frac{k_1}{6} + \frac{k_2}{3} + \frac{k_3}{3} + 
+					\frac{k_4}{6} + O \left( h^5 \right)\]
+
+By plugging the values into the energy equations we can obtain the total
+energy:
+
+\[ K = 0.5 m v^2 \]
+\[ U = mgh \]
+\[ E_{mechanical} = K + U \]
+
+where K is the kinetic energy and U is the potential energy.
+
+\section*{Results}
+
+In the simulations, I set the length to 100 m, both masses to 1 kg, the time
+step to 0.01 s and the pendulum in an exact horizontal position. Running
+the simulation using the fourth order Runge-Kutta method gave these
+results: \\
+
+\begin{tikzpicture}
+\begin{axis}[
+  title={Evolution of Energy using RK4},
+  xlabel=Time (s),
+  ylabel=Mechnical Energy (J)]
+\addplot table [y=Energy, x=Time]{runge-kutta energy vs time.dat};
+\end{axis}
+\end{tikzpicture}
+
+This serves as validation for the code. Since the energy is conserved at
+2943 J, I know that there are no logical errors. Running the simulation
+using Euler's method results in the following: \\
+
+\begin{tikzpicture}
+\begin{axis}[
+  title={Evolution of Energy using Euler's Method},
+  xlabel=Time (s),
+  ylabel=Mechnical Energy (J)]
+\addplot table [y=Energy, x=Time]{euler energy vs time.dat};
+\end{axis}
+\end{tikzpicture}
+
+The energy of the system is increasing. It begins at the proper value of
+2943 J, but from there it continues to increase indefinitely. The rate of
+increase does seem to decrease, but it still displays a fluctuating
+behaviour, which is inappropriate for the evolution of the system.
+
+\section*{Discussion}
+Euler's method clearly has a major weakness. It cannot adequately represent
+the evolution of the double pendulum, let alone of other chaotic systems.
+Each iteration has too much error for it even to properly describe the path
+of the double pendulum in the first 5 seconds.
+
+\medskip
+
+\section*{References}
+
+\noindent
+Weisstein, Eric W. “Double Pendulum.” \textit{Eric Weisstein’s World of Physics},
+\indent WolframResearch, 2007, scienceworld.wolfram.com/physics/ \\
+\indent DoublePendulum.html.
+
+\noindent
+“Animate a Pendulum." \textit{Rosettacode}, May 2019, rosettacode.org/wiki/ \\
+\indent Animate\_a\_pendulum.
+
+\noindent
+Assencio, Diego. “double-pendulum." \textit{GitHub Inc.}, Dec. 2018, \\
+\indent github.com/dassencio/double-pendulum.
+
+\noindent
+“Creating a document in Latex." \textit{Overleaf}, 2019, www.overleaf.com/learn \\
+\indent /latex/Creating\_a\_document\_in\_LaTeX\#The\_preamble\_of\_a\_document.
+
+\noindent
+Nuemann, Erik. “Double Pendulum." \textit{My Physics Lab}, Feb. 2018, \\
+\indent www.myphysicslab.com/pendulum/double-pendulum-en.html.
+
+\noindent
+Agarwal, Arpit. “Runge-Kutta 4th Order Method to Solve Differential \\
+\indent  Equation." \textit{Geeks for Geeks}, https://www.geeksforgeeks.org/runge- \\
+\indent kutta-4th-order-method-solve-differential-equation/.
+
+
+\noindent
+“Double Pendulum." \textit{Math 24}, MathJax, www.math24.net/. \\
+\indent double-pendulum/
+
+\end{document}

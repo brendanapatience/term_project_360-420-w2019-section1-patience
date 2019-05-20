@@ -5,12 +5,12 @@ import javax.swing.*;
 public class DoublePendulum extends JPanel implements Runnable {
 
 	//constants
-  private int L = 100;             		//length of rod (cm)
+  private int L = 100;             		//length of rod (m)
   private double M1 = 1;            	//mass of inner bob (kg)
   private double M2 = 1;              //mass of outer bob (kg)
 	private double G = 9.81;					  //force of gravity (N/kg)
 	private double DT = 0.01;					  //step height (s)
-  public static boolean difSol = true;      //differential equation solver: set to true for fourth order runge kutta, false for euler's
+  public static boolean difSol = false;      //differential equation solver: set to true for fourth order runge kutta, false for euler's
   private static boolean file = true;        //set to true to calculate and write mechanical energy vs time to a file, false to not do that
 
 	//variables
