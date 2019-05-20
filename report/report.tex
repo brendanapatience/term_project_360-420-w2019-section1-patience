@@ -30,8 +30,9 @@ constant).
 \section*{Description of Numerical Method}
 
 Before applying the ODE solvers, the equations of motion of the pendulum
-must be obtained. The first step is to find the Lagrangian of the 
-pendulum, given by
+must be obtained. The only assumption made is that the lengths of both 
+rods are equal. All other values can be freely manipulated. The first 
+step is to find the Lagrangian of the pendulum, given by
 
 \[L = T - V \]
 
@@ -42,8 +43,9 @@ respect to the angular velocity of each bob:
 \[p_1 = \frac{\partial L}{\partial \dot{\theta_1}} \]
 \[p_2 = \frac{\partial L}{\partial \dot{\theta_2}} \]
 
-The next step is to convert the Lagrangian equation into the Hamiltonian
-equation, expressed by the following relationship
+These are needed in the next step which is to convert the Lagrangian 
+equation into the Hamiltonian equation. The relationship of the two is
+expressed by the following:
 
 \[H = \sum_{i=1}^{2} \left( \dot{\theta_i} p_i \right) - L \]
 
@@ -96,8 +98,9 @@ RK4:
 \[ y_{n+1} = y_n + \frac{k_1}{6} + \frac{k_2}{3} + \frac{k_3}{3} + 
 					\frac{k_4}{6} + O \left( h^5 \right)\]
 
-By plugging the values into the energy equations we can obtain the total
-energy:
+By plugging the values obtained from each iteration into the energy 
+equations, we can obtain the mechanical energy of the system as it evolves
+with time:
 
 \[ K = 0.5 m v^2 \]
 \[ U = mgh \]
@@ -108,7 +111,7 @@ where K is the kinetic energy and U is the potential energy.
 \section*{Results}
 
 In the simulations, I set the length to 100 m, both masses to 1 kg, the time
-step to 0.01 s and the pendulum in an exact horizontal position. Running
+step to 0.01 s and the pendulum to an exact horizontal position. Running
 the simulation using the fourth order Runge-Kutta method gave these
 results: \\
 
@@ -122,8 +125,8 @@ results: \\
 \end{tikzpicture}
 
 This serves as validation for the code. Since the energy is conserved at
-2943 J, I know that there are no logical errors. Running the simulation
-using Euler's method results in the following: \\
+2943 J, I know that there are no logical errors in the code. Running the
+simulation using Euler's method results in the following: \\
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -137,13 +140,12 @@ using Euler's method results in the following: \\
 The energy of the system is increasing. It begins at the proper value of
 2943 J, but from there it continues to increase indefinitely. The rate of
 increase does seem to decrease, but it still displays a fluctuating
-behaviour, which is inappropriate for the evolution of the system.
+behaviour, which is inappropriate for the evolution of the system. \\
 
-\section*{Discussion}
-Euler's method clearly has a major weakness. It cannot adequately represent
-the evolution of the double pendulum, let alone of other chaotic systems.
-Each iteration has too much error for it even to properly describe the path
-of the double pendulum in the first 5 seconds.
+Euler's method clearly has a major weakness. Each iteration has too much
+error for it even to properly describe the path of the double pendulum 
+in the first 5 seconds. It cannot adequately represent the evolution of 
+the double pendulum, let alone of other chaotic systems.
 
 \medskip
 
